@@ -2,33 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meals/Data/dummy_data.dart';
+import 'package:meals/model/meal.dart';
 import 'package:meals/providers/favourites_provider.dart';
-import 'package:meals/screens/account.dart';
 import 'package:meals/screens/category.dart';
+import 'package:meals/screens/favourites.dart';
 import 'package:meals/screens/filters.dart';
-import 'package:meals/screens/meals.dart';
 import 'package:meals/widgets/drawer.dart';
+import 'package:meals/providers/filters_provider.dart';
 
-const kInitialFilters = {
-  Filters.glutenFree: false,
-  Filters.lactoseFree: false,
-  Filters.vegan: false,
-  Filters.vegetarian: false,
-};
-
-class tabscreen extends ConsumerStatefulWidget {
-  const tabscreen({super.key});
+class Tabscreen extends ConsumerStatefulWidget {
+  const Tabscreen({super.key});
 
   @override
-  ConsumerState<tabscreen> createState() {
-    return _tabscreen();
+  ConsumerState<Tabscreen> createState() {
+    return _TabscreenState();
   }
 }
 
-class _tabscreen extends ConsumerState<tabscreen> {
-  int _selectedIndex = 0;
+class _TabscreenState extends ConsumerState<Tabscreen> {
+  List<Meal> meal = [];
 
-  Map<Filters, bool> _selectedFilters = kInitialFilters;
+  int _selectedIndex = 0;
 
   void _selextPage(int index) {
     setState(() {
@@ -37,38 +31,50 @@ class _tabscreen extends ConsumerState<tabscreen> {
   }
 
   void _selectScreen(String identifier) async {
+    Navigator.of(context).pop();
     if (identifier == 'Filters') {
-      final result = await Navigator.of(context).push<Map<Filters, bool>>(
-        MaterialPageRoute(builder: (ctx) => const FiltersScreen()),
+      await Navigator.of(context).push<Map<Filters, bool>>(
+        MaterialPageRoute(builder: (ctx) => FiltersScreen()),
       );
-
-      setState(() {
-        _selectedFilters = result ?? kInitialFilters;
-      });
-    } else if (identifier == 'Account') {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (ctx) => const accountScreen()));
-    } else {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (ctx) => const tabscreen()));
     }
+  }
+
+  void _removefavourite(Meal meal) {
+    final favme = ref.watch(favmealsProvider);
+    final mealindex = favme.indexOf(meal);
+    setState(() {
+      favme.remove(meal);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 4),
+        content: const Text('favourite removed'),
+        action: SnackBarAction(
+          label: 'undo',
+          onPressed: () {
+            setState(() {
+              favme.insert(mealindex, meal);
+            });
+          },
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(context) {
+    final activeFilters = ref.watch(filtersProvider);
     final availablemeals = dummyMeals.where((meal) {
-      if (_selectedFilters[Filters.glutenFree]! && !meal.isGlutenFree) {
+      if (activeFilters[Filters.glutenFree]! && !meal.isGlutenFree) {
         return false;
       }
-      if (_selectedFilters[Filters.lactoseFree]! && !meal.isLactoseFree) {
+      if (activeFilters[Filters.lactoseFree]! && !meal.isLactoseFree) {
         return false;
       }
-      if (_selectedFilters[Filters.vegan]! && !meal.isVegan) {
+      if (activeFilters[Filters.vegan]! && !meal.isVegan) {
         return false;
       }
-      if (_selectedFilters[Filters.vegetarian]! && !meal.isVegetarian) {
+      if (activeFilters[Filters.vegetarian]! && !meal.isVegetarian) {
         return false;
       }
       return true;
@@ -77,7 +83,10 @@ class _tabscreen extends ConsumerState<tabscreen> {
     Widget activeSreen = categoryScreen(availablemeals: availablemeals);
     if (_selectedIndex == 1) {
       final favmeals = ref.watch(favmealsProvider);
-      activeSreen = mealsScreen(meals: favmeals);
+      activeSreen = FavouriteScreen(
+        meals: favmeals,
+        onremovemeal: _removefavourite,
+      );
       title = 'Favourites';
     }
 
@@ -85,11 +94,12 @@ class _tabscreen extends ConsumerState<tabscreen> {
       appBar: AppBar(
         title: Text(
           title,
-          style: GoogleFonts.gentiumBookPlus(
-            color: Color.fromARGB(255, 177, 223, 217),
+          style: GoogleFonts.dmSerifDisplay(
+            color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
         ),
+        backgroundColor: Color.fromARGB(255, 0, 33, 33),
       ),
       drawer: Drawerwidget(onSelectScreen: _selectScreen),
 

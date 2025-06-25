@@ -6,10 +6,9 @@ class accountScreen extends StatelessWidget {
   @override
   Widget build(context) {
     return Scaffold(
-      body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-
-
-       ],
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [SizedBox(child: Text('data'))],
       ),
     );
   }

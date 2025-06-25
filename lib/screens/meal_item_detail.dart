@@ -55,7 +55,7 @@ class MealItemDetailScreen extends ConsumerWidget {
             clipBehavior: Clip.hardEdge,
             child: FadeInImage(
               placeholder: MemoryImage(kTransparentImage),
-              image: NetworkImage(meal.imageUrl),
+              image: AssetImage(meal.imageUrl),
               height: 250,
               width: double.infinity,
               fit: BoxFit.cover,

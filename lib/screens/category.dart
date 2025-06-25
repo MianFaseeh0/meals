@@ -10,7 +10,7 @@ class categoryScreen extends StatelessWidget {
 
   final List<Meal> availablemeals;
   void selectCatogary(context, Catogary category) {
-    final filterredMealc = dummyMeals
+    final filterredMealc = availablemeals
         .where((meals) => meals.categories.contains(category.id))
         .toList();
     Navigator.of(context).push(
@@ -23,7 +23,7 @@ class categoryScreen extends StatelessWidget {
     return GridView(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 10,
+        mainAxisSpacing: 18,
         childAspectRatio: 1.7,
       ),
       children: [

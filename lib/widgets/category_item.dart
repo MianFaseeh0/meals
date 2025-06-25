@@ -37,10 +37,7 @@ class CategoryItem extends StatelessWidget {
 
           child: Text(
             categories.title,
-            style: GoogleFonts.gentiumBookPlus(
-              color: Theme.of(context).colorScheme.onTertiaryContainer,
-              fontSize: 15,
-            ),
+            style: GoogleFonts.gentiumBookPlus(color: Colors.white),
           ),
         ),
       ),
